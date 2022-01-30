@@ -11,6 +11,7 @@ class MainActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
+    private val handler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,14 +37,18 @@ class MainActivity : AppCompatActivity() {
     private fun loadCity(callback: (String) -> Unit) {
         thread {
             Thread.sleep(5000)
-            callback.invoke("Moscow")
+            handler.post {
+                callback.invoke("Moscow")
+            }
         }
     }
 
     private fun loadTemperature(callback: (Int) -> Unit) {
         thread {
             Thread.sleep(1000)
-            callback.invoke(17)
+            handler.post {
+                callback.invoke(17)
+            }
         }
     }
 }
