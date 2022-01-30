@@ -2,17 +2,20 @@ package com.example.coroutines_sumin
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import androidx.core.view.isVisible
 import com.example.coroutines_sumin.databinding.ActivityMainBinding
+import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        binding.button.setOnClickListener{
+        binding.button.setOnClickListener {
             loadData()
         }
     }
@@ -20,21 +23,27 @@ class MainActivity : AppCompatActivity() {
     private fun loadData() {
         binding.progressBar.isVisible = true
         binding.button.isEnabled = false
-        val city = loadCity()
-        binding.location.text = city
-        val temperature = loadTemperature()
-        binding.temperature.text = temperature.toString()
+        loadCity {
+            binding.location.text = it
+        }
+        loadTemperature {
+            binding.temperature.text = it.toString()
+        }
         binding.progressBar.isVisible = false
         binding.button.isEnabled = true
     }
 
-    private fun loadCity(): String {
-        Thread.sleep(5000)
-        return "Moscow"
+    private fun loadCity(callback: (String) -> Unit) {
+        thread {
+            Thread.sleep(5000)
+            callback.invoke("Moscow")
+        }
     }
 
-    private fun loadTemperature(): Int {
-        Thread.sleep(1000)
-        return 17
+    private fun loadTemperature(callback: (Int) -> Unit) {
+        thread {
+            Thread.sleep(1000)
+            callback.invoke(17)
+        }
     }
 }
