@@ -25,12 +25,12 @@ class MainActivity : AppCompatActivity() {
         binding.button.isEnabled = false
         loadCity {
             binding.location.text = it
+            loadTemperature {
+                binding.temperature.text = it.toString()
+                binding.progressBar.isVisible = false
+                binding.button.isEnabled = true
+            }
         }
-        loadTemperature {
-            binding.temperature.text = it.toString()
-        }
-        binding.progressBar.isVisible = false
-        binding.button.isEnabled = true
     }
 
     private fun loadCity(callback: (String) -> Unit) {
