@@ -4,51 +4,44 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.example.coroutines_sumin.databinding.ActivityMainBinding
+import kotlinx.coroutines.delay
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
-    private val handler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         binding.button.setOnClickListener {
-            loadData()
+            lifecycleScope.launchWhenResumed {
+                loadData()
+            }
         }
     }
 
-    private fun loadData() {
+    private suspend fun loadData() {
         binding.progressBar.isVisible = true
         binding.button.isEnabled = false
-        loadCity {
-            binding.location.text = it
-            loadTemperature {
-                binding.temperature.text = it.toString()
-                binding.progressBar.isVisible = false
-                binding.button.isEnabled = true
-            }
-        }
+        val city = loadCity()
+        binding.location.text = city
+        val temperature = loadTemperature()
+        binding.temperature.text = temperature.toString()
+        binding.progressBar.isVisible = false
+        binding.button.isEnabled = true
     }
 
-    private fun loadCity(callback: (String) -> Unit) {
-        thread {
-            Thread.sleep(5000)
-            handler.post {
-                callback.invoke("Moscow")
-            }
-        }
+    private suspend fun loadCity(): String {
+        delay(5000)
+        return "Moscow"
     }
 
-    private fun loadTemperature(callback: (Int) -> Unit) {
-        thread {
-            Thread.sleep(1000)
-            handler.post {
-                callback.invoke(17)
-            }
-        }
+    private suspend fun loadTemperature(): Int {
+        delay(1000)
+        return 17
     }
 }
